@@ -1,0 +1,15 @@
+//这里的package与类中的含义类似，主要是为了防止命名冲突
+package app;
+
+//指定输出包结构。如果在facet中指定了输出路径，那么这里的路径就是会在输出路径下开始建立包结构
+option java_package = "com.damon.protobuf.addressbook";
+//指定生成的类名字
+option java_outer_classname = "AddressBookProtos";
+
+//被引入的proto也需要单独编译，否则也是找不到
+import "person.proto";
+
+message AddressBook {
+    repeated Person person = 1;
+}
+

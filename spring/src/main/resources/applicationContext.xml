@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop" xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+		http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd"
+       default-lazy-init="true">
+
+    <!-- 扫描注解，排除Controller -->
+    <context:component-scan base-package="com.damon.spring" use-default-filters="false">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+    <!-- 注册自定义PropertyEditor 但是这里好像不好使！-->
+    <bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+        <property name="propertyEditorRegistrars">
+            <list>
+                <bean class="com.damon.spring.util.CustomPropertyEditorRegistrar"/>
+            </list>
+        </property>
+        <property name="customEditors">
+            <map>
+                <entry key="com.damon.spring.bean.User" value="com.damon.spring.bean.UserEditor"/>
+            </map>
+        </property>
+    </bean>
+
+</beans>

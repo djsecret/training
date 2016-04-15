@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!-- 只扫描Controller注解 -->
+    <context:component-scan base-package="com.damon.spring.controller" use-default-filters="false">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+    <mvc:annotation-driven conversion-service="conversionService">
+        <!-- 如果定制了message-converters，那么默认情况下，将不会再注册自带的HttpMessageConverter，例如StringHttpMessageConverter等
+             如果需要开启默认HttpMessageConverter，添加register-defaults="true"-->
+        <mvc:message-converters register-defaults="true">
+            <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+                <property name="objectMapper" ref="mvcJsonObjectMapper"/>
+            </bean>
+            <!--<bean class="org.springframework.http.converter.xml.MarshallingHttpMessageConverter">-->
+                <!--<property name="marshaller" ref="jaxb2Marshaller" />-->
+                <!--<property name="unmarshaller" ref="jaxb2Marshaller" />-->
+            <!--</bean>-->
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+
+    <!-- 这里使用定制的objectMapper -->
+    <bean id="mvcJsonObjectMapper" class="com.fasterxml.jackson.databind.ObjectMapper">
+        <property name="serializationInclusion" ref="non_empty" />
+        <!--<property name="dateFormat" ref="date_format"/>-->
+    </bean>
+
+    <!-- 不序列化空的属性 ，也可以在*每!个!*实体bean上添加@JsonInclude(JsonInclude.Include.NON_EMPTY) -->
+    <bean id="non_empty" class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean">
+        <property name="staticField" value="com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY"/>
+    </bean>
+
+    <!-- 对于日期格式化输出，可以在get方法上面加 @JsonFormat(pattern = "yyyy-MM-dd")-->
+    <bean id="date_format" class="java.text.SimpleDateFormat">
+        <constructor-arg value="yyyy-MM-dd hh:mm:ss"/>
+    </bean>
+
+    <!-- xml与object的转换器，得引入spring.oxm包 -->
+    <!--<bean id="jaxb2Marshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller">-->
+        <!--&lt;!&ndash; packagesToScan指明需要扫描的bean包&ndash;&gt;-->
+        <!--<property name="packagesToScan" value="com.damon.spring.bean"/>-->
+    <!--</bean>-->
+    <!--<bean id="castorMarshaller" class="org.springframework.oxm.castor.CastorMarshaller"/>-->
+
+    <!-- 注册自己的Converter，也可以注册formatter，@DateTimeFormat就是一种formatter-->
+    <bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+        <property name="converters">
+            <set>
+                <bean class="com.damon.spring.util.CustomerStringToStringArrayConverter"/>
+            </set>
+        </property>
+    </bean>
+
+
+</beans>

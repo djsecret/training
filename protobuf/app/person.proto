@@ -1,0 +1,39 @@
+package app;
+
+option java_package = "com.damon.protobuf.addressbook";
+option java_outer_classname = "PersonProtos";
+
+//定义的一个枚举，至于顺序，就是发现在例子中，都是先在message前面定义了，然后再使用的
+//注意：1.跟java中的枚举不同，这里也使用分号分隔。 2.同样需要二进制tag
+enum Gender {
+    BOY = 0;
+    GIRL = 1;
+}
+
+//使用message声明一个数据结构
+//这里的二进制tag（=1）我是这样理解的：
+//因为一个数据结构要序列化来传输，那么势必是要进行编码的
+//protobuf为了提高效率，使用二进制编码
+//而这里的tag就代表对应的二进制数
+//经常出现的和repeated的使用小的数字，这样能节省空间，有点像霍夫曼？
+//The " = 1", " = 2" markers on each element identify the unique "tag" that field uses in the binary encoding.
+message Person {
+    required string uid = 1;
+    optional string username = 2;
+    optional int32 age = 3;
+    optional Gender gender = 4;
+
+    enum PhoneType {
+        MOBILE = 0;
+        HOME = 1;
+        WORK = 2;
+    }
+
+    message PhoneNumber {
+        required string number = 1;
+        //这里添加了默认值，如果不指定，那么会使用默认的设定
+        optional PhoneType type = 2 [default = MOBILE];
+    }
+
+    repeated PhoneNumber phone = 5;
+}
