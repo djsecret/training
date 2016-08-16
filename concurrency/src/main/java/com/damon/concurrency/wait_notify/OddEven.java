@@ -14,54 +14,48 @@ public class OddEven {
     private static int num2 = 2;
 
     public static void main(String[] args) {
-        final OddEven oddEven = new OddEven();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (num1 < 100) {
-                    //两个线程都用t对象作为锁，保证每个交替期间只有一个线程在打印
-                    synchronized (oddEven) {
-                        // 如果state!=1, 说明此时尚未轮到线程1打印, 线程1将调用t的wait()方法, 直到下次被唤醒
-                        if (state != 1) {
-                            try {
-                                oddEven.wait();
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
+        final Object oddEven = new Object();
+        new Thread(() -> {
+            while (num1 < 100) {
+                //两个线程都用t对象作为锁，保证每个交替期间只有一个线程在打印
+                synchronized (oddEven) {
+                    // 如果state!=1, 说明此时尚未轮到线程1打印, 线程1将调用t的wait()方法, 直到下次被唤醒
+                    if (state != 1) {
+                        try {
+                            oddEven.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
-                        // 当state=1时, 轮到线程1打印5次数字
-                        for (int i = 0; i < 5; ++i) {
-                            System.out.println(num1);
-                            num1 += 2;
-                        }
-                        // 线程1打印完成后, 将state赋值为2, 表示接下来将轮到线程2打印
-                        state = 2;
-                        // notifyAll()方法唤醒在t上wait的线程2, 同时线程1将退出同步代码块, 释放t锁
-                        oddEven.notifyAll();
                     }
+                    // 当state=1时, 轮到线程1打印5次数字
+                    for (int i = 0; i < 5; ++i) {
+                        System.out.println(num1);
+                        num1 += 2;
+                    }
+                    // 线程1打印完成后, 将state赋值为2, 表示接下来将轮到线程2打印
+                    state = 2;
+                    // notifyAll()方法唤醒在t上wait的线程2, 同时线程1将退出同步代码块, 释放t锁
+                    oddEven.notifyAll();
                 }
             }
         }).start();
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (num2 < 100) {
-                    synchronized (oddEven) {
-                        if (state != 2) {
-                            try {
-                                oddEven.wait();
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
+        new Thread(() -> {
+            while (num2 < 100) {
+                synchronized (oddEven) {
+                    if (state != 2) {
+                        try {
+                            oddEven.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
-                        for (int i = 0; i < 5; ++i) {
-                            System.out.println(num2);
-                            num2 += 2;
-                        }
-                        state = 1;
-                        oddEven.notifyAll();
                     }
+                    for (int i = 0; i < 5; ++i) {
+                        System.out.println(num2);
+                        num2 += 2;
+                    }
+                    state = 1;
+                    oddEven.notifyAll();
                 }
             }
         }).start();

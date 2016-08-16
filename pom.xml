@@ -9,6 +9,9 @@
         <module>concurrency</module>
         <module>protobuf</module>
         <module>mybatis</module>
+        <module>rocket-mq</module>
+        <module>network</module>
+        <module>exception</module>
     </modules>
 
     <groupId>com.damon</groupId>
@@ -19,7 +22,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <org.springframework.version>3.1.4.RELEASE</org.springframework.version>
+        <org.springframework.version>4.2.4.RELEASE</org.springframework.version>
         <spring.ws.version>2.1.4.RELEASE</spring.ws.version>
         <org.slf4j.version>1.7.5</org.slf4j.version>
         <logback.version>1.0.13</logback.version>
@@ -260,6 +263,12 @@
             </dependency>
 
             <!-- third part end-->
+
+            <dependency>
+                <groupId>com.alibaba.rocketmq</groupId>
+                <artifactId>rocketmq-client</artifactId>
+                <version>3.2.6</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>
